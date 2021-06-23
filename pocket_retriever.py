@@ -44,12 +44,17 @@ def calc_dis(distanceList1,distanceList2):
     return a
 
 for j_file in glob.glob("/home/chens/data/pepbdb/pepbdb/*"):
-    with open(os.path.join(j_file, "peptide.pdb")) as peptide_file:
-        peptide_info = get_info_from_pdb(peptide_file.readlines())
-    with open(os.path.join(j_file, "receptor.pdb")) as receptor_file:
-        receptor_info = get_info_from_pdb(receptor_file.readlines())
-    peptide_atoms = np.array(peptide_info['atom_sites'])
-    receptor_CAs = np.array(peptide_info['CA_sites'])
+    try:
+        with open(os.path.join(j_file, "peptide.pdb")) as peptide_file:
+            peptide_info = get_info_from_pdb(peptide_file.readlines())
+        with open(os.path.join(j_file, "receptor.pdb")) as receptor_file:
+            receptor_info = get_info_from_pdb(receptor_file.readlines())
+        peptide_atoms = np.array(peptide_info['atom_sites'])
+        receptor_CAs = np.array(peptide_info['CA_sites'])
 
-    distance_matrix = calc_dis(peptide_atoms, receptor_CAs)
-    print(peptide_atoms.shape, receptor_CAs.shape, distance_matrix.shape,)
+        distance_matrix = calc_dis(peptide_atoms, receptor_CAs)
+        for i in range(receptor_CAs.shape[0]):
+            if np.min(distance_matrix[:, i]) < 6.5:
+                print(f'{i}: {receptor_CAs[i]}')
+    except:
+        print(f'error when processing {j_file}')
